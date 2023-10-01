@@ -1,0 +1,27 @@
+- hosts: centralServer
+  become: true
+  user: ansible
+  tasks:
+    - name: Enable EPEL Repository
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - epel-release
+        - traceroute
+        - tcpdump
+    - name: disabled default route
+      lineinfile:
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        line: DEFROUTE=NO
+    - name: add default gateway for centralRouter
+      lineinfile:
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+        line: GATEWAY=192.168.10.1
+    - name: Service network restart
+      service:
+        name: network
+        state: restarted
+    - name: reboot
+      reboot:
+      

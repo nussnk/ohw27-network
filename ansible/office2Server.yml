@@ -1,0 +1,10 @@
+- hosts: office2Server
+  become: true
+  user: ansible
+  tasks: 
+  - name: remove default route
+    command: ip ro del default
+  - name: add default route
+    command: ip ro add default via 192.168.1.1
+    
+

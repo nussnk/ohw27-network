@@ -1,0 +1,43 @@
+- hosts: inetRouter
+  become: true
+  user: ansible
+  tasks:
+    - name: Enable EPEL Repository
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - epel-release
+        - traceroute
+        - tcpdump
+        - iptables
+        - iptables-services
+    - name: copy iptables config
+      template:
+        src: inetRouter-iptables
+        dest: /etc/sysconfig/iptables
+        owner: root
+        group: root
+        mode: 0600
+    - name: start and enable iptables service
+      service:
+        name: iptables
+        state: restarted
+        enabled: true
+    - name: enable ip_forward for routers
+      sysctl:
+        name: net.ipv4.conf.all.forwarding
+        value: '1'
+        state: present
+    - name: static routes for inetRouter
+      template:
+        src: inetRouter-static_routes
+        dest: /etc/sysconfig/network-scripts/route-eth1
+        owner: root
+        group: root
+        mode: 0600
+    - name: reboot
+      reboot:
+
+
+      

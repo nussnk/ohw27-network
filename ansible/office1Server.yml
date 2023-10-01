@@ -1,0 +1,10 @@
+- hosts: office1Server
+  become: true
+  user: ansible
+  tasks:
+    - name: add default route
+      template:
+        src: office1Server-routes.j2
+        dest: /etc/netplan/50-vagrant.yaml
+    - name: Apply netplan
+      command: netplan apply

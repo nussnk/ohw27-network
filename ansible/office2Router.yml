@@ -1,0 +1,13 @@
+- hosts: office2Router
+  become: true
+  user: ansible
+  tasks:
+    - name: enable ip_forward for routers
+      sysctl:
+        name: net.ipv4.conf.all.forwarding
+        value: '1'
+        state: present
+    - name: Removing default route
+      command: ip ro del default
+    - name: Adding the default route
+      command: ip ro add default via 192.168.255.5

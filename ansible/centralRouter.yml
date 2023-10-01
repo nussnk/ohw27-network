@@ -1,0 +1,41 @@
+- hosts: centralRouter
+  become: true
+  user: ansible
+  tasks:
+    - name: Enable EPEL Repository
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - epel-release
+        - traceroute
+        - tcpdump
+    - name: enable ip_forward for routers
+      sysctl:
+        name: net.ipv4.conf.all.forwarding
+        value: '1'
+        state: present
+    - name: disabled default route
+      lineinfile:
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+        line: DEFROUTE=NO
+    - name: add default gateway for centraRouter
+      lineinfile:
+        dest: /etc/sysconfig/network-scripts/ifcfg-eth1
+        line: GATEWAY=192.168.255.1
+    - name: add static routes for centralRouter eth5
+      template:
+        src: centralRouter-static_routes-eth5
+        dest: /etc/sysconfig/network-scripts/route-eth5
+        owner: root
+        group: root
+        mode: 0600
+    - name: add static routes for centralRouter eth6
+      template:
+        src: centralRouter-static_routes-eth6
+        dest: /etc/sysconfig/network-scripts/route-eth6
+        owner: root
+        group: root
+        mode: 0600
+    - name: reboot
+      reboot:

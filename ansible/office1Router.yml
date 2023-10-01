@@ -1,0 +1,16 @@
+- hosts: office1Router
+  become: true
+  user: ansible
+  tasks:
+    - name: enable ip_forward for routers
+      sysctl:
+        name: net.ipv4.conf.all.forwarding
+        value: '1'
+        state: present
+    - name: disabled default route
+      template:
+        src: office1Router-routes.j2
+        dest: /etc/netplan/50-vagrant.yaml
+    - name: Apply netplan
+      command: netplan apply
+      
